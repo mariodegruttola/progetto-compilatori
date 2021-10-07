@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE ProgramOP SYSTEM "roles.dtd">
+<ProgramOP>
+    <ProcOp>
+        <Identifier>somma</Identifier>
+        <ParDeclOp>
+            <Type>int</Type>
+            <Identifier>x</Identifier>
+            <Identifier>y</Identifier>
+        </ParDeclOp>
+        <ResultType>int</ResultType>
+        <ProcBodyOp>
+            <AddOp>
+                <Identifier>x</Identifier>
+                <Identifier>y</Identifier>
+            </AddOp>
+        </ProcBodyOp>
+    </ProcOp>
+    <ProcOp>
+        <Identifier>duplica</Identifier>
+        <ParDeclOp>
+            <Type>int</Type>
+            <Identifier>x</Identifier>
+        </ParDeclOp>
+        <ResultType>int</ResultType>
+        <ResultType>int</ResultType>
+        <ProcBodyOp>
+            <Identifier>x</Identifier>
+            <Identifier>x</Identifier>
+        </ProcBodyOp>
+    </ProcOp>
+    <ProcOp>
+        <Identifier>fun1</Identifier>
+        <ParDeclOp>
+            <Type>int</Type>
+            <Identifier>x</Identifier>
+        </ParDeclOp>
+        <ResultType>int</ResultType>
+        <ProcBodyOp>
+            <Identifier>x</Identifier>
+        </ProcBodyOp>
+    </ProcOp>
+    <ProcOp>
+        <Identifier>main</Identifier>
+        <ProcBodyOp>
+            <VarDeclOp>
+                <Type>int</Type>
+                <IdInitOp>
+                    <Identifier>x</Identifier>
+                    <IntConst>5</IntConst>
+                </IdInitOp>
+                <IdInitOp>
+                    <Identifier>y</Identifier>
+                    <IntConst>3</IntConst>
+                </IdInitOp>
+            </VarDeclOp>
+            <WriteOp>
+                <StringConst>"Ciao Mario il valore di x è "</StringConst>
+                <Identifier>x</Identifier>
+                <StringConst>" e quello di y è "</StringConst>
+                <Identifier>y</Identifier>
+                <StringConst>". Il risultato della funzione è "</StringConst>
+                <CallProcOp>
+                    <Identifier>somma</Identifier>
+                    <CallProcOp>
+                        <Identifier>fun1</Identifier>
+                        <CallProcOp>
+                            <Identifier>somma</Identifier>
+                            <Identifier>x</Identifier>
+                            <Identifier>y</Identifier>
+                        </CallProcOp>
+                    </CallProcOp>
+                    <AddOp>
+                        <Identifier>y</Identifier>
+                        <CallProcOp>
+                            <Identifier>fun1</Identifier>
+                            <IntConst>10</IntConst>
+                        </CallProcOp>
+                    </AddOp>
+                </CallProcOp>
+                <StringConst>"\n"</StringConst>
+            </WriteOp>
+        </ProcBodyOp>
+    </ProcOp>
+</ProgramOP>

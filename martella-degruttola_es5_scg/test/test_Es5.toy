@@ -1,0 +1,107 @@
+proc somma(int x, y) int :
+    -> x + y
+corp;
+
+
+proc moltiplica(int x, y) int :
+    int count := 1;
+    int result;
+
+    if y = 0 || x = 0 then
+        result := 0;
+    else
+        result := x;
+        while count < y do
+            result := somma(result, x);
+            count := count + 1;
+        od;
+    fi;
+
+    -> result
+corp;
+
+
+proc dividi(int x, y) int :
+    -> x / y
+corp;
+
+proc potenza(int x, y) int :
+    int result := x, count := 2;
+
+    if y = 0 then
+        if x = 0 then
+            result := 0;
+        else
+            result := 1;
+        fi;
+    elif y > 1 then
+        while count <= y do
+            result := moltiplica(result, x);
+            count := count + 1;
+        od;
+    fi;
+
+    -> result
+corp;
+
+proc fibonacci(int x) int :
+    int result;
+
+    if x = 0 then
+        result := 0;
+    elif x = 1 then
+        result := 1;
+    else
+        result := fibonacci(x - 1) + fibonacci(x - 2);
+    fi;
+
+    -> result
+corp;
+
+proc input(int op) int, int :
+    int a := 0, b := 0;
+
+    if op >= 1 && op <= 3 then
+        write("\nInserisci primo operando: ");
+        readln(a);
+        write("Inserisci secondo operando: ");
+        readln(b);
+    elif op = 4 then
+        write("\nInserisci la base: ");
+        readln(a);
+        write("Inserisci l'esponente: ");
+        readln(b);
+    elif op = 5 then
+        write("\nInserisci il numero su cui calcolare la successione di fibonacci: ");
+        readln(a);
+    fi;
+
+    -> a, b
+corp;
+
+
+proc main() void :
+    int x := 0, y := 0, op := 0;
+    while
+        write(" 1. addizione\n 2. moltiplicazione\n 3. divisione\n 4. elevamento a potenza\n 5. fibonacci\n 6. esci\nInserisci il numero dell'operazione: ");
+        readln(op);
+        ->
+        op <> 6
+    do
+        x, y := input(op);
+        if op = 1 then
+            write("Il risultato della somma è: ", somma(x, y), "\n\n");
+        elif op = 2 then
+            write("Il risultato della moltiplicazione è: ", moltiplica(x, y), "\n\n");
+        elif op = 3 then
+            write("Il risultato della divisione è: ", dividi(x, y), "\n\n");
+        elif op = 4 then
+            write("Il risultato dell'elevamento a potenza è: ", potenza(x, y), "\n\n");
+        elif op = 5 then
+            write("Il risultato di fibonacci è: ", fibonacci(x), "\n\n");
+        else
+            write("Numero operazione non presente, inserisci un numero che sia compreso tra 1 e 6\n\n");
+        fi;
+    od;
+    ->
+corp;

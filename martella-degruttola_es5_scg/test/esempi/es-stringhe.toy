@@ -1,0 +1,27 @@
+proc fun1(string x) string:
+    write(x);
+    -> "Ciccio0"
+corp;
+
+proc fun2(string x) string :
+    x := "Ciccio2\n";
+    write(x);
+    -> "Ciccio3"
+corp;
+
+proc main() void :
+    string b := "Ciccio1";
+    string a;
+
+    a := fun2(b);
+    write("a: ", a, " - b: ", b, "\n");
+
+    if a = b then
+        write("a e b sono uguali\n");
+    else
+        write("a e b sono diversi\n");
+    fi;
+
+    ->
+corp;
+

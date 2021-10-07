@@ -1,0 +1,17 @@
+proc somma(int x, y) int :
+    -> x + y
+corp;
+
+proc duplica(int x) int, int :
+    -> x, x
+corp;
+
+proc fun1(int x) int :
+    -> x
+corp;
+
+proc main() void :
+    int x := 5, y := 3;
+    write("Ciao Mario il valore di x è ", x, " e quello di y è ", y, ". Il risultato della funzione è ", somma(fun1(somma(x, y)), y + fun1(10)), "\n");
+    ->
+corp;

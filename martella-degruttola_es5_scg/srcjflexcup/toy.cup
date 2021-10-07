@@ -1,0 +1,197 @@
+import java.util.ArrayList;
+import nodes.*;
+import nodes.exprs.*;
+import nodes.statements.*;
+
+terminal RETURN, UMINUS, SEMI, COMMA, INT, STRING, FLOAT, BOOL, PROC, LPAR, RPAR, COLON, CORP, VOID, IF, THEN, ELIF, FI, ELSE, WHILE, DO, OD, READ, WRITE, ASSIGN, PLUS, MINUS, TIMES, DIV, EQ, NE, LT, LE, GT, GE, AND, OR, NOT, NULL, TRUE, FALSE;
+
+terminal String ID;
+terminal String INT_CONST;
+terminal String FLOAT_CONST;
+terminal String STRING_CONST;
+
+nonterminal ProgramOp Program;
+nonterminal ArrayList<VarDeclOp> VarDeclList;
+nonterminal VarDeclOp VarDecl;
+nonterminal String Type;
+nonterminal ArrayList<IdInitOp> IdListInit;
+
+nonterminal ArrayList<ProcOp> ProcList;
+nonterminal ProcOp Proc;
+nonterminal ArrayList<ParDeclOp> ParamDeclList;
+nonterminal ParDeclOp ParDecl;
+nonterminal ArrayList<Identifier> IdList;
+nonterminal ArrayList<String> ResultTypeListWithVoid;
+nonterminal ArrayList<String> ResultTypeList;
+nonterminal ArrayList<Expr> ReturnExprs;
+
+nonterminal BodyOp StatList;
+nonterminal Statement Stat;
+nonterminal ReadOp ReadlnStat;
+nonterminal WriteOp WriteStat;
+nonterminal AssignOp AssignStat;
+nonterminal WhileOp WhileStat;
+nonterminal IfOp IfStat;
+nonterminal ArrayList<ElifOp> ElifList;
+nonterminal ElifOp Elif;
+nonterminal BodyOp Else;
+nonterminal CallProcOp CallProc;
+
+nonterminal ArrayList<Expr> ExprList;
+nonterminal Expr Expr;
+
+
+precedence left NE;
+precedence left OR;
+precedence left AND;
+precedence left GT, LT, GE, LE, EQ;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV;
+precedence left UMINUS;
+
+/*
+- Nelle produzioni
+Proc ::= PROC ID:id LPAR ParamDeclList:parDeclOpList RPAR ResultTypeList:resultTypeList COLON VarDeclList:varDeclOpList StatList:statOpList ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), parDeclOpList, resultTypeList, new ProcBodyOp(varDeclOpList, statOpList.getStatements(), returnExprsOp)); :}
+| PROC ID:id LPAR ParamDeclList:parDeclOpList RPAR ResultTypeList:resultTypeList COLON VarDeclList:varDeclOpList ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), parDeclOpList, resultTypeList, new ProcBodyOp(varDeclOpList, new ArrayList<Statement>(), returnExprsOp)); :}
+| PROC ID:id LPAR RPAR ResultTypeList:resultTypeList COLON VarDeclList:varDeclOpList StatList:statOpList ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), new ArrayList<ParDeclOp>(), resultTypeList, new ProcBodyOp(varDeclOpList, statOpList.getStatements(), returnExprsOp)); :}
+| PROC ID:id LPAR RPAR ResultTypeList:resultTypeList COLON VarDeclList:varDeclOpList ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), new ArrayList<ParDeclOp>(), resultTypeList, new ProcBodyOp(varDeclOpList, new ArrayList<Statement>(), returnExprsOp)); :}
+;
+
+c'è un conflitto reduce/reduce dato dalla vicinanza dei non terminali StatList e ReturnExprs.
+In particolare il conflitto è dato dal terminale ID che può essere raggiunto a partire da
+StatList => Stat => AssignStat COMMA ExprList => IdList COMMA ExprList => ID COMMA ExprList
+ReturnExprs => ExprList => Expr => ID
+risolto aggiungento il terminale RETURN in tutte le Proc tra StatList e ReturnExprs
+
+Stesso problema nella produzione
+WhileStat ::= WHILE StatList:bodyOp1 Expr:expr DO StatList:bodyOp2 OD {: RESULT = new WhileOp(bodyOp1, expr, bodyOp2); :}
+risolto aggiungendo il terminale RETURN tra StatList ed Expr
+
+- Avevamo inserito RETURN in ReturnExprs per non avere il simbolo di RETURN sulle procedure che non restituiscono niente
+*/
+
+Program ::= VarDeclList:varDeclOpList ProcList:procOpList {: RESULT = new ProgramOp(varDeclOpList, procOpList); :}
+;
+
+VarDeclList ::= VarDeclList:varDeclOpList VarDecl:varDeclOp {: varDeclOpList.add(varDeclOp); RESULT = varDeclOpList; :}
+| /* empty */ {: RESULT = new ArrayList<VarDeclOp>(); :}
+;
+
+ProcList ::= ProcList:procOpList Proc:procOp {: procOpList.add(procOp); RESULT = procOpList; :}
+| Proc:procOp {: RESULT = new ArrayList<ProcOp>() {{add(procOp);}}; :}
+;
+
+VarDecl ::= Type:type IdListInit:idList SEMI {: RESULT = new VarDeclOp(type, idList); :}
+;
+
+Type ::= INT {: RESULT = "int"; :}
+| BOOL {: RESULT = "bool"; :}
+| FLOAT {: RESULT = "float"; :}
+| STRING {: RESULT = "string"; :}
+;
+
+IdListInit ::= ID:id {: RESULT = new ArrayList<IdInitOp>() {{add(new IdInitOp(new Identifier(id), null));}}; :}
+| IdListInit:idInitOpList COMMA ID:id {: idInitOpList.add(new IdInitOp(new Identifier(id), null)); RESULT = idInitOpList; :}
+| ID:id ASSIGN Expr:expr {: RESULT = new ArrayList<IdInitOp>() {{add(new IdInitOp(new Identifier(id), expr));}}; :}
+| IdListInit:idInitOpList COMMA ID:id ASSIGN Expr:expr {: idInitOpList.add(new IdInitOp(new Identifier(id), expr)); RESULT = idInitOpList; :}
+;
+
+Proc ::= PROC ID:id LPAR ParamDeclList:parDeclOpList RPAR ResultTypeListWithVoid:resultTypeList COLON VarDeclList:varDeclOpList StatList:statOpList RETURN ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), parDeclOpList, resultTypeList, new ProcBodyOp(varDeclOpList, statOpList.getStatements(), returnExprsOp)); :}
+| PROC ID:id LPAR ParamDeclList:parDeclOpList RPAR ResultTypeListWithVoid:resultTypeList COLON VarDeclList:varDeclOpList RETURN ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), parDeclOpList, resultTypeList, new ProcBodyOp(varDeclOpList, new ArrayList<Statement>(), returnExprsOp)); :}
+| PROC ID:id LPAR RPAR ResultTypeListWithVoid:resultTypeList COLON VarDeclList:varDeclOpList StatList:statOpList RETURN ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), new ArrayList<ParDeclOp>(), resultTypeList, new ProcBodyOp(varDeclOpList, statOpList.getStatements(), returnExprsOp)); :}
+| PROC ID:id LPAR RPAR ResultTypeListWithVoid:resultTypeList COLON VarDeclList:varDeclOpList RETURN ReturnExprs:returnExprsOp CORP SEMI {: RESULT = new ProcOp(new Identifier(id), new ArrayList<ParDeclOp>(), resultTypeList, new ProcBodyOp(varDeclOpList, new ArrayList<Statement>(), returnExprsOp)); :}
+;
+
+ResultTypeListWithVoid ::= ResultTypeList:resultTypeList {: RESULT = resultTypeList; :}
+| VOID {: RESULT = new ArrayList<String>(); :}
+;
+
+ResultTypeList ::= Type:resultType {: RESULT = new ArrayList<String>() {{add(resultType);}}; :}
+| ResultTypeList:resultTypeList COMMA Type:resultType {:  resultTypeList.add(resultType); RESULT = resultTypeList; :}
+;
+
+ReturnExprs ::= ExprList:exprOpList {: RESULT = exprOpList; :}
+| /* empty */ {: RESULT = new ArrayList<Expr>(); :}
+;
+
+ParamDeclList ::= ParDecl:parDeclOp {: RESULT = new ArrayList<ParDeclOp>() {{add(parDeclOp);}}; :}
+| ParamDeclList:parDeclOpList SEMI ParDecl:parDeclOp {: parDeclOpList.add(parDeclOp); RESULT = parDeclOpList; :}
+;
+
+ParDecl ::= Type:type IdList:idList {: RESULT = new ParDeclOp(type, idList); :}
+;
+
+IdList ::= ID:id {: RESULT = new ArrayList<Identifier>() {{add(new Identifier(id));}}; :}
+| IdList:idList COMMA ID:id {: idList.add(new Identifier(id)); RESULT = idList; :}
+;
+
+StatList ::= Stat:stat {: RESULT = new BodyOp(new ArrayList<Statement>() {{add(stat);}}); :}
+| StatList:bodyOp Stat:stat {: bodyOp.addToArray(stat); RESULT = bodyOp; :}
+;
+
+Stat ::= IfStat:ifOp SEMI {: RESULT = ifOp; :}
+| WhileStat:whileOp SEMI {: RESULT = whileOp; :}
+| ReadlnStat:readOp SEMI {: RESULT = readOp; :}
+| WriteStat:writeOp SEMI {: RESULT = writeOp; :}
+| AssignStat:assignOp SEMI {: RESULT = assignOp; :}
+| CallProc:callProcOp SEMI {: RESULT = callProcOp; :}
+;
+
+ReadlnStat ::= READ LPAR IdList:idList RPAR {: RESULT = new ReadOp(idList); :}
+;
+
+IfStat ::= IF Expr:expr THEN StatList:bodyOp ElifList:elifList Else:elseS FI {: RESULT = new IfOp(expr, bodyOp, elifList, elseS); :}
+;
+
+ElifList ::= ElifList:elifList Elif:elifOp {: elifList.add(elifOp); RESULT = elifList; :}
+| /* empty */ {: RESULT = new ArrayList<ElifOp>(); :}
+;
+
+Elif ::= ELIF Expr:expr THEN StatList:bodyOp {: RESULT = new ElifOp(expr, bodyOp); :}
+;
+
+Else ::= ELSE StatList:bodyOp {: RESULT = bodyOp; :}
+| /* empty */{: RESULT = null; :}
+;
+
+WhileStat ::= WHILE StatList:bodyOp1 RETURN Expr:expr DO StatList:bodyOp2 OD {: RESULT = new WhileOp(bodyOp1, expr, bodyOp2); :}
+| WHILE Expr:expr DO StatList:bodyOp2 OD {: RESULT = new WhileOp(null, expr, bodyOp2); :}
+;
+
+AssignStat ::= IdList:idList ASSIGN ExprList:exprList {: RESULT = new AssignOp(idList, exprList); :}
+;
+
+CallProc ::= ID:id LPAR ExprList:exprList RPAR {: RESULT = new CallProcOp(new Identifier(id), exprList); :}
+| ID:id LPAR RPAR {: RESULT = new CallProcOp(new Identifier(id), new ArrayList<Expr>()); :}
+;
+
+WriteStat ::= WRITE LPAR ExprList:exprList RPAR {: RESULT = new WriteOp(exprList); :}
+;
+
+ExprList ::= Expr:expr {: RESULT = new ArrayList<Expr>() {{add(expr);}}; :}
+| ExprList:exprList COMMA Expr:expr {: exprList.add(expr); RESULT = exprList; :}
+;
+
+Expr ::= NULL {: RESULT = new NullConst("null"); :}
+	| TRUE {: RESULT = new BooleanConst("true"); :}
+	| FALSE {: RESULT = new BooleanConst("false"); :}
+	| INT_CONST:intConst {: RESULT = new IntConst(intConst); :}
+	| FLOAT_CONST:floatConst {: RESULT = new FloatConst(floatConst); :}
+	| STRING_CONST:stringConst {: RESULT = new StringConst(stringConst); :}
+	| ID:id {: RESULT = new Identifier(id); :}
+    | CallProc:callProcOp {: RESULT = callProcOp; :}
+	| Expr:expr1 PLUS Expr:expr2 {: RESULT = new AddOp(expr1, expr2); :}
+	| Expr:expr1 MINUS Expr:expr2 {: RESULT = new DiffOp(expr1, expr2); :}
+	| Expr:expr1 TIMES Expr:expr2 {: RESULT = new MulOp(expr1, expr2); :}
+	| Expr:expr1 DIV Expr:expr2 {: RESULT = new DivOp(expr1, expr2); :}
+	| Expr:expr1 AND Expr:expr2 {: RESULT = new AndOp(expr1, expr2); :}
+	| Expr:expr1 OR Expr:expr2 {: RESULT = new OrOp(expr1, expr2); :}
+	| Expr:expr1 GT Expr:expr2 {: RESULT = new GTOp(expr1, expr2); :}
+	| Expr:expr1 GE Expr:expr2 {: RESULT = new GEOp(expr1, expr2); :}
+	| Expr:expr1 LT Expr:expr2 {: RESULT = new LTOp(expr1, expr2); :}
+	| Expr:expr1 LE Expr:expr2 {: RESULT = new LEOp(expr1, expr2); :}
+	| Expr:expr1 EQ Expr:expr2 {: RESULT = new EQOp(expr1, expr2); :}
+	| Expr:expr1 NE Expr:expr2 {: RESULT = new NEOp(expr1, expr2); :}
+	| MINUS Expr:expr {: RESULT = new UminusOp(expr); :} %prec UMINUS
+	| NOT Expr:expr {: RESULT = new NotOp(expr); :}
+;

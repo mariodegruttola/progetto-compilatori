@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE ProgramOP SYSTEM "roles.dtd">
+<ProgramOP>
+    <ProcOp>
+        <Identifier>duplica</Identifier>
+        <ParDeclOp>
+            <Type>int</Type>
+            <Identifier>x</Identifier>
+        </ParDeclOp>
+        <ResultType>int</ResultType>
+        <ResultType>int</ResultType>
+        <ProcBodyOp>
+            <Identifier>x</Identifier>
+            <Identifier>x</Identifier>
+        </ProcBodyOp>
+    </ProcOp>
+    <ProcOp>
+        <Identifier>main</Identifier>
+        <ProcBodyOp>
+            <VarDeclOp>
+                <Type>int</Type>
+                <IdInitOp>
+                    <Identifier>x</Identifier>
+                    <IntConst>5</IntConst>
+                </IdInitOp>
+            </VarDeclOp>
+            <VarDeclOp>
+                <Type>int</Type>
+                <IdInitOp>
+                    <Identifier>a</Identifier>
+                </IdInitOp>
+                <IdInitOp>
+                    <Identifier>b</Identifier>
+                </IdInitOp>
+            </VarDeclOp>
+            <AssignOp>
+                <Identifiers>
+                    <Identifier>a</Identifier>
+                    <Identifier>b</Identifier>
+                </Identifiers>
+                <Exprs>
+                    <CallProcOp>
+                        <Identifier>duplica</Identifier>
+                        <Identifier>x</Identifier>
+                    </CallProcOp>
+                </Exprs>
+            </AssignOp>
+            <WriteOp>
+                <StringConst>"a: "</StringConst>
+                <Identifier>a</Identifier>
+                <StringConst>"\nb: "</StringConst>
+                <Identifier>b</Identifier>
+                <StringConst>"\n"</StringConst>
+            </WriteOp>
+        </ProcBodyOp>
+    </ProcOp>
+</ProgramOP>

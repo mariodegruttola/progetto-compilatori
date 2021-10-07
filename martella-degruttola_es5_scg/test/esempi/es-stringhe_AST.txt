@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE ProgramOP SYSTEM "roles.dtd">
+<ProgramOP>
+    <ProcOp>
+        <Identifier>fun1</Identifier>
+        <ParDeclOp>
+            <Type>string</Type>
+            <Identifier>x</Identifier>
+        </ParDeclOp>
+        <ResultType>string</ResultType>
+        <ProcBodyOp>
+            <WriteOp>
+                <Identifier>x</Identifier>
+            </WriteOp>
+            <StringConst>"Ciccio0"</StringConst>
+        </ProcBodyOp>
+    </ProcOp>
+    <ProcOp>
+        <Identifier>fun2</Identifier>
+        <ParDeclOp>
+            <Type>string</Type>
+            <Identifier>x</Identifier>
+        </ParDeclOp>
+        <ResultType>string</ResultType>
+        <ProcBodyOp>
+            <AssignOp>
+                <Identifiers>
+                    <Identifier>x</Identifier>
+                </Identifiers>
+                <Exprs>
+                    <StringConst>"Ciccio2\n"</StringConst>
+                </Exprs>
+            </AssignOp>
+            <WriteOp>
+                <Identifier>x</Identifier>
+            </WriteOp>
+            <StringConst>"Ciccio3"</StringConst>
+        </ProcBodyOp>
+    </ProcOp>
+    <ProcOp>
+        <Identifier>main</Identifier>
+        <ProcBodyOp>
+            <VarDeclOp>
+                <Type>string</Type>
+                <IdInitOp>
+                    <Identifier>b</Identifier>
+                    <StringConst>"Ciccio1"</StringConst>
+                </IdInitOp>
+            </VarDeclOp>
+            <VarDeclOp>
+                <Type>string</Type>
+                <IdInitOp>
+                    <Identifier>a</Identifier>
+                </IdInitOp>
+            </VarDeclOp>
+            <AssignOp>
+                <Identifiers>
+                    <Identifier>a</Identifier>
+                </Identifiers>
+                <Exprs>
+                    <CallProcOp>
+                        <Identifier>fun2</Identifier>
+                        <Identifier>b</Identifier>
+                    </CallProcOp>
+                </Exprs>
+            </AssignOp>
+            <WriteOp>
+                <StringConst>"a: "</StringConst>
+                <Identifier>a</Identifier>
+                <StringConst>" - b: "</StringConst>
+                <Identifier>b</Identifier>
+                <StringConst>"\n"</StringConst>
+            </WriteOp>
+            <IfOp>
+                <EQOp>
+                    <Identifier>a</Identifier>
+                    <Identifier>b</Identifier>
+                </EQOp>
+                <BodyOp>
+                    <WriteOp>
+                        <StringConst>"a e b sono uguali\n"</StringConst>
+                    </WriteOp>
+                </BodyOp>
+                <BodyOp>
+                    <WriteOp>
+                        <StringConst>"a e b sono diversi\n"</StringConst>
+                    </WriteOp>
+                </BodyOp>
+            </IfOp>
+        </ProcBodyOp>
+    </ProcOp>
+</ProgramOP>

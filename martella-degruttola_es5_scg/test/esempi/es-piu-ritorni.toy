@@ -1,0 +1,14 @@
+proc duplica(int x) int, int :
+    -> x, x
+corp;
+
+proc main() void :
+    int x := 5;
+    int a, b;
+
+    a, b := duplica(x);
+
+    write("a: ", a,  "\nb: ", b, "\n");
+
+    ->
+corp;
